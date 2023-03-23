@@ -9,10 +9,6 @@ import HelloWorld from './components/HelloWorld.vue'
 
     <div>
       <HelloWorld msg="用户名" />
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
     </div>
   </header>
 
@@ -30,30 +26,5 @@ header {
   float: left;
   margin-left: 2rem;
   margin-right: 0.5rem;
-}
-
-nav {
-  width: 100%;
-  font-size: 16px;
-  margin-top: 2rem;
-  margin-left: 1rem;
-}
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
 }
 </style>

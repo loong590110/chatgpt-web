@@ -1,5 +1,5 @@
 <script>
-import * as Vue from 'vue'
+import { inject } from 'vue'
 import axios from 'axios'
 import moment from 'moment'
 import MessageGPT from '../components/MessageGPT.vue'
@@ -9,6 +9,7 @@ export default {
   data() {
     return {
       title: '等待输入...',
+      token: '',
       sessionId: -1,
       sessions: [],
     }
@@ -19,6 +20,15 @@ export default {
       const session = this.sessions[sessionId]
       session.messages.push(message)
       localStorage.setItem('sessions', JSON.stringify(this.sessions))
+    },
+
+    randomString(e) {
+      var e = e || 32,
+        t = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
+        a = t.length,
+        n = "";
+      for (let i = 0; i < e; i++) n += t.charAt(Math.floor(Math.random() * a));
+      return n
     },
 
     onSend() {
@@ -40,33 +50,39 @@ export default {
         this.$refs.output_box.scrollTop = this.$refs.output_box.scrollHeight
       }
 
-      const template = `<MessageMe msg="${msg} datetime="${moment().format('YYYY-MM-DD HH:mm:ss')}" />`;
+      // const template = `<MessageMe msg="${msg} datetime="${moment().format('YYYY-MM-DD HH:mm:ss')}" />`;
       insertMessage(msg, "#555555")
 
-      const message = { "role": "user", "content": `${msg}` }
-      this.sessionId = this.sessionId === -1 ? this.sessions.length : this.sessionId
-      this.saveSessions(this.sessionId, message)
+      // const message = { "role": "user", "content": `${msg}` }
+      // this.sessionId = this.sessionId === -1 ? this.sessions.length : this.sessionId
+      // this.saveSessions(this.sessionId, message)
+
+      // const getFormData = object => Object.keys(object).reduce((formData, key) => {
+      //   formData.append(key, object[key]);
+      //   return formData;
+      // }, new FormData());
 
       const data = {
-        "model": "gpt-3.5-turbo",
-        "messages": this.sessions[this.sessionId].messages
+        "token": this.token,
+        "msg": msg,//this.sessions[this.sessionId].messages
+        "timeout": "60"
       }
 
       const config = {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('APP_KEY')}`,
         }
       }
 
-      axios.post('https://api.openai.com/v1/chat/completions', JSON.stringify(data), config)
+      axios.post('http://107.174.95.210:8000/msg', JSON.stringify(data), config)
         .then(response => {
           this.title = "等待输入..."
-          let data = response.data
-          const template = `<MessageMe msg="${data} datetime="${moment().format('YYYY-MM-DD HH:mm:ss')}" />`;
-          const message = data.choices[0].message
-          this.saveSessions(this.sessionId, message)
-          insertMessage(message.content.trim(), "#00000000")
+          const data = response.data
+          // const template = `<MessageMe msg="${data} datetime="${moment().format('YYYY-MM-DD HH:mm:ss')}" />`;
+          // const message = data.choices[0].message
+          // this.saveSessions(this.sessionId, message)
+          // insertMessage(message.content.trim(), "#00000000")
+          insertMessage(data, "#00000000")
         })
         .catch(error => {
           console.log(error)
@@ -74,7 +90,8 @@ export default {
     }
   },
   mounted() {
-    this.sessions = JSON.parse(localStorage.getItem('sessions')) ?? []
+    // this.sessions = JSON.parse(localStorage.getItem('sessions')) ?? []
+    this.token = this.randomString(16)
   }
 }
 </script>
@@ -83,7 +100,7 @@ export default {
   <div class="container">
     <div class="output">
       <div class="title"><img alt="Vue logo" src="@/assets/logo.svg" />
-        <h3>{{ title }}</h3>
+        <h4>{{ title }}</h4>
       </div>
       <div class="content" ref="output_box"></div>
     </div>
@@ -119,7 +136,7 @@ export default {
   float: left;
   width: 20px;
   height: 20px;
-  margin-right: 2px;
+  margin-right: 8px;
 }
 
 .content {

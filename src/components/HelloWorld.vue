@@ -17,12 +17,12 @@ defineProps({
 <style scoped>
 h1 {
   font-weight: 500;
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   top: -5px;
 }
 
 h3 {
-  font-size: 1.2rem;
+  font-size: 0.9rem;
 }
 
 .greetings h1,
